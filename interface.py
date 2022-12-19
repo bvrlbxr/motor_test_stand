@@ -264,7 +264,7 @@ class Interface:
 	def start_test_req(self):
 
 		if self.input4.get():
-			data_file_name = f"""{self.input4.get()}_{datetime.datetime.now().strftime("%d_%M_%Y_%H_%m_%S")}"""
+			data_file_name = f"""{self.input4.get()}_{datetime.datetime.now().strftime("%d%M%Y_%H%m%S")}"""
 			self.device_obj.start_test_req(data_file_name)  # transmit file name to Connector obj
 		else:
 			print("error введите название теста или выберите из существующих перед стартом")

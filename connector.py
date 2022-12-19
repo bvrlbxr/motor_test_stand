@@ -60,12 +60,15 @@ class CurrentMaster:
 	def start_test_req(self,data_file_name):
 
 		if not self.test_start:
-			headers = "Time (ms),dshot,Voltage (V),Current (A),RPM,Thrust (g)"
+			headers = ["Time (ms)","dshot","Voltage (V)","Current (A)","RPM,Thrust (g)"]
 			print(data_file_name, "коннектор")
 			self.test_start = True
 			self.test_run = True
-			with open(f'./graphic_data/{data_file_name}.csv', 'w', newline='') as outfile:
-				csv.writer(outfile, indent=4)
+			with open(f'./graphic_data/{data_file_name}.csv', 'w', newline='') as csvfile:
+				telemetry_data = csv.writer(csvfile, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+				telemetry_data.writerow(headers)
+				for i in range(100): # test
+					telemetry_data.writerow([9686, 1547, 16.83, 24.2, 31157, 1])
 			print("start_test_ok")
 		else:
 			print("коннектор: тест уже начался")
