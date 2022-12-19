@@ -1,0 +1,9 @@
+{
+  "type": "serial",
+  "port": "COM1",
+  "baudrate": 9600,
+  "bytesize": 8,
+  "parity": "None",
+  "stopbits": 1,
+  "device_adress": 122
+}
