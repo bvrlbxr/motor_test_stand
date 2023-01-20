@@ -1,9 +1,14 @@
 {
-  "type": "serial",
+  "type": "socket",
+  "connect_attemps": 5,
+  "serial_config": "------------",
   "port": "COM1",
   "baudrate": 9600,
   "bytesize": 8,
-  "parity": "None",
+  "parity": "N",
   "stopbits": 1,
-  "device_adress": 122
+  "device_address": 122,
+  "socket_config": "------------",
+  "host": "127.0.0.1",
+  "socket_port": 6500
 }

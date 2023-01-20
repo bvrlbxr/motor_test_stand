@@ -5,25 +5,31 @@ from connector import CurrentMaster
 from graphic import CreatePlot
 
 
+def load_existing_files(dir_name, file_ext, combo_obj):
+	existing_configs = []
+	for i in os.listdir(f"./{dir_name}"):
+		if i.endswith(f".{file_ext}"):
+			existing_configs.append(i.split(".")[0])
+	combo_obj["values"] = existing_configs
+
+
 class Interface:
 
-	def __init__(self,master):
-
+	def __init__(self):
+		self.root = Tk()
 		self.app_style = Style()
 		self.app_style.theme_use("clam")
+		self.fig = None
 		# self.app_style.configure("TButton",background="#f7a34f")
 		# self.app_style.configure("TFrame",background="#ffbf80")
 		# create connect obj
 		self.device_obj = CurrentMaster()
+		self.device_obj.configure_current_master()  # connection to device
 		# create frame
-		self.frame = Frame(root)
+		self.frame = Frame(self.root)
 		self.frame.grid()
 
 		# common labels
-
-		# error label
-		self.error_label = Label(self.frame,text="")
-		self.error_label.grid(row=0, column=0)
 
 		# parametr label
 		self.par_label = Label(self.frame,text="Параметры теста",font="Arial 10")
@@ -80,6 +86,10 @@ class Interface:
 		# save tenzo
 		self.button2 = Button(self.frame, text="Сохранить тензодатчик", command=self.save_tenzo_parameters)
 		self.button2.grid(row=14, column=0)
+
+		# error label
+		self.error_label = Label(self.frame,text="")
+		self.error_label.grid(row=15, column=0)
 
 		# column 1
 		# current values ==================
@@ -150,36 +160,20 @@ class Interface:
 		self.button6.grid(row=11, column=4)
 
 		# ===================================
-		# init existing configs
-		self.load_test_configs()
-		self.load_tenzo_configs()
-		self.load_data_plots()
+		# init existing files
+
+		load_existing_files("test_configs","json",self.combo_test_configs)  # test configs
+		load_existing_files("tenzo","json",self.combo_tenzo_configs)  # tenzo configs
+		load_existing_files("graphic_data","csv",self.combo_plot_configs)  # existing plots
 
 	def print_graphics(self):
 		"""
 		test start
 		"""
 		file_name = self.combo_plot_configs.get()
-		fig = CreatePlot(f"./graphic_data/{file_name}.csv", "png")
-		fig.create_plot()
-		fig.show_plot()
-
-	def load_test_configs(self):
-		"""
-		load existing configs
-		"""
-		test_config = []
-		for i in os.listdir("./test_configs"):
-			if i.endswith(".json"):
-				test_config.append(i.split(".")[0])
-		self.combo_test_configs["values"] = test_config
-
-	def load_data_plots(self):
-		data_plots = []
-		for i in os.listdir("./graphic_data"):
-			if i.endswith(".csv"):
-				data_plots.append(i.split(".")[0])
-		self.combo_plot_configs["values"] = data_plots
+		self.fig = CreatePlot(f"./graphic_data/{file_name}.csv", "png")
+		self.fig.create_plot()
+		self.fig.show_plot()
 
 	def save_test_parameters(self):
 		"""
@@ -197,7 +191,7 @@ class Interface:
 			# saving parameters....
 			time.sleep(0.5)
 			# updating combobox
-			self.load_test_configs()
+			load_existing_files("test_configs","json",self.combo_test_configs)
 		else:
 			print("ошибка сохранения: введите напряжение,ток, скорость и название теста")
 
@@ -214,7 +208,7 @@ class Interface:
 		# saving parameters....
 		time.sleep(0.5)
 		# updating combobox
-		self.load_tenzo_configs()
+		load_existing_files("tenzo","json",self.combo_tenzo_configs)  # tenzo configs
 
 	def load_selected_tenzo(self):
 		try:
@@ -229,17 +223,6 @@ class Interface:
 			self.input5.insert(0,file_name)
 		except:
 			print("cannot load tenzo config")
-
-	def load_tenzo_configs(self):
-		"""
-		load existing configs
-		"""
-		tenzo_configs = []
-		for i in os.listdir("./tenzo"):
-			if i.endswith(".json"):
-				tenzo_configs.append(i.split(".")[0])
-		self.combo_tenzo_configs["values"] = tenzo_configs
-
 
 	def load_selected_config(self):
 		try:
@@ -264,13 +247,21 @@ class Interface:
 	def start_test_req(self):
 
 		if self.input4.get():
-			data_file_name = f"""{self.input4.get()}_{datetime.datetime.now().strftime("%d%M%Y_%H%m%S")}"""
+			data_file_name = f"""{self.input4.get()}_{datetime.datetime.now().strftime("%d%m%Y_%H%M%S")}"""
 			self.device_obj.start_test_req(data_file_name)  # transmit file name to Connector obj
+			if self.device_obj.test_start:
+				load_existing_files("graphic_data","csv",self.combo_plot_configs)  # refresh plot data catalogue
+
 		else:
 			print("error введите название теста или выберите из существующих перед стартом")
+			self.show_error("error введите название теста или выберите из существующих перед стартом")
 
 	def clear_input(self,entry_obj):
 		entry_obj.delete(0,len(entry_obj.get()))
 
-root = Tk()
-my_interface = Interface(root)
+	def show_error(self,error_text):
+		pass
+
+
+
+

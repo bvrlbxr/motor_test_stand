@@ -1,5 +1,7 @@
 from interface import *
 
 if __name__ == "__main__":
-    root.title("Тестирование мотора")
-    root.mainloop()
+
+    App = Interface()
+    App.root.title("Тестирование мотора")
+    App.root.mainloop()
